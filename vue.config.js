@@ -3,6 +3,7 @@ const pxtorem = require('postcss-pxtorem');
 const UploadStaticWebpackPlugin = require('static-upload-plugin');
 
 module.exports = {
+    publicPath: 'http://static-cdn.lxzmww.xyz/melody_frontend/',
     css: {
         loaderOptions: {
             postcss: {
