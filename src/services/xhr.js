@@ -3,10 +3,8 @@ import { Toast } from 'vant';
 
 const BASE_URL_MAP = {
   'development': 'http://localhost:7001',
-  'production': 'http://melody.lxzmww.xyz'
+  'production': 'http://139.199.14.123:7002'
 };
-
-console.log(BASE_URL_MAP[process.env.NODE_ENV]);
 
 const axios = Axios.create({
   baseURL: BASE_URL_MAP[process.env.NODE_ENV],
