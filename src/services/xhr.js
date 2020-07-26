@@ -2,8 +2,8 @@ import Axios from 'axios';
 import { Toast } from 'vant';
 
 const BASE_URL_MAP = {
-  'development': 'http://localhost:7001',
-  'production': 'http://139.199.14.123:7002'
+  'development': 'http://localhost:3002',
+  'production': 'http://chameleon.logcas.name'
 };
 
 const axios = Axios.create({
