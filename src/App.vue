@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <van-tabs v-model="active" type="card" swipeable animated>
-      <van-tab title="全部">
+    <van-tabs v-model="active" animated sticky>
+      <van-tab title="曲库">
         <van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
           <van-cell
             v-for="(item, index) in list"
@@ -9,10 +9,10 @@
             is-link
             @click="onChangeSong(item, index, 'all')"
           >
-            <div class="like" @click="onLike(item, $event)">
+            <!-- <div class="like" @click="onLike(item, $event)">
               <van-icon v-show="isMyLike(item)" name="star" />
               <van-icon v-show="!isMyLike(item)" name="star-o" />
-            </div>
+            </div> -->
             <div
               class="cell-content"
               :class="{
@@ -30,32 +30,8 @@
           </van-cell>
         </van-list>
       </van-tab>
-      <van-tab title="我喜欢">
-          <van-cell
-            v-for="(item, index) in likeList"
-            :key="item._id"
-            is-link
-            @click="onChangeSong(item, index, 'like')"
-          >
-            <div class="like" @click="onLike(item, $event)">
-              <van-icon v-show="isMyLike(item)" name="star" />
-              <van-icon v-show="!isMyLike(item)" name="star-o" />
-            </div>
-            <div
-              class="cell-content"
-              :class="{
-              playing: index === currentIndex && currentType === 'like'
-            }"
-            >
-              <span class="seq" v-show="index !== currentIndex">{{ index + 1 }}</span>
-              <van-icon
-                v-show="index === currentIndex"
-                name="play-circle-o"
-                style="margin-right: 5px"
-              />
-              {{ item.name }}
-            </div>
-          </van-cell>
+      <van-tab title="设置">
+        <van-cell is-link title="播放模式" @click="showPlayModeSetting = true" />
       </van-tab>
     </van-tabs>
     <div class="player">
@@ -79,6 +55,7 @@
         width: progress + '%'
       }"></div>
     </div>
+    <van-action-sheet v-model="showPlayModeSetting" cancel-text="取消" close-on-click-action :actions="playModes" @select="onSelectPlayMode" />
   </div>
 </template>
 
@@ -104,7 +81,11 @@ export default {
       likeList: [],
       progress: 0,
       progressTimer: null,
-      loadingSource: false
+      loadingSource: false,
+      showPlayModeSetting: false,
+      playModes: [
+        { name: '顺序播放', value: 'seq' }, { name: '随机播放', value: 'random' },
+      ]
     };
   },
   watch: {
@@ -219,6 +200,13 @@ export default {
         this.currentSongName = nextSong.name;
         this.currentSongUrl = nextSong.url;
       }
+    },
+    onSelectPlayMode({ value }) {
+      songLister.setMode(value);
+      this.$notify({
+        type: 'success',
+        message: `当前模式：${value === 'seq' ? '顺序播放' : '随机播放'}`
+      });
     }
   },
   created() {
@@ -273,7 +261,6 @@ export default {
 }
 
 .cell-content {
-  margin-left: 30px;
   color: gray;
   transition: all 0.5s;
 

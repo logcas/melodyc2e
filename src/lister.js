@@ -1,6 +1,45 @@
+import { Toast } from 'vant';
+
 export const LIST_TYPE = {
   ALL: 'all',
   LIKE: 'like'
+}
+
+export const PLAY_MODE = {
+  SEQ: 'seq',
+  RANDOM: 'random'
+}
+
+export const getNextIndexStragy = {
+  [PLAY_MODE.SEQ]: (len, currentIndex) => {
+    let nextIndex = currentIndex + 1;
+    nextIndex = nextIndex < len ? nextIndex : 0;
+    return nextIndex;
+  },
+  [PLAY_MODE.RANDOM]: (len, currentIndex) => {
+    function getIndex(max) {
+      return Math.floor(Math.random() * max);
+    }
+    let nextIndex;
+    while((nextIndex = getIndex(len)) === currentIndex);
+    return nextIndex;
+  }
+}
+
+export const getLastIndexStragy = {
+  [PLAY_MODE.SEQ]: (len, currentIndex) => {
+    let nextIndex = currentIndex - 1;
+    nextIndex = nextIndex >= 0 ? nextIndex : len - 1;
+    return nextIndex;
+  },
+  [PLAY_MODE.RANDOM]: (len, currentIndex) => {
+    function getIndex(max) {
+      return Math.floor(Math.random() * max);
+    }
+    let nextIndex;
+    while((nextIndex = getIndex(len)) === currentIndex);
+    return nextIndex;
+  }
 }
 
 export class SongLister {
@@ -10,6 +49,24 @@ export class SongLister {
     this.listTypes = [LIST_TYPE.ALL, LIST_TYPE.LIKE, ...types];
     this.lists = new Map();
     this.currentIndex = 0;
+    let defaultMode = localStorage.getItem('playMode');
+    if (!defaultMode) {
+      defaultMode = PLAY_MODE.RANDOM;
+    }
+    this.playMode = defaultMode;
+    Toast(`当前模式：${ this.playMode === PLAY_MODE.RANDOM ? '随机播放' : '顺序播放' }`);
+  }
+
+  get mode() {
+    return this.playMode;
+  }
+
+  setMode(mode) {
+    if (![PLAY_MODE.RANDOM, PLAY_MODE.SEQ].includes(mode)) {
+      return;
+    }
+    localStorage.setItem('playMode', mode);
+    this.playMode = mode;
   }
 
   _getOrDefault(key, defaultValue) {
@@ -54,8 +111,7 @@ export class SongLister {
   nextSong() {
     const list = this._getCurrentList();
     const len = list.length;
-    let nextIndex = this.currentIndex + 1;
-    nextIndex = nextIndex < len ? nextIndex : 0;
+    const nextIndex = getNextIndexStragy[this.playMode](len, this.currentIndex);
     this.currentIndex = nextIndex;
     return list[nextIndex];
   }
@@ -63,8 +119,7 @@ export class SongLister {
   lastSong() {
     const list = this._getCurrentList();
     const len = list.length;
-    let nextIndex = this.currentIndex - 1;
-    nextIndex = nextIndex >= 0 ? nextIndex : len - 1;
+    const nextIndex = getLastIndexStragy[this.playMode](len, this.currentIndex);
     this.currentIndex = nextIndex;
     return list[nextIndex];
   }

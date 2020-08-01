@@ -2,7 +2,7 @@ import Axios from 'axios';
 import { Toast } from 'vant';
 
 const BASE_URL_MAP = {
-  'development': 'http://localhost:3002',
+  'development': 'http://chameleon.logcas.name',
   'production': 'http://chameleon.logcas.name'
 };
 
